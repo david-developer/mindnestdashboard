@@ -1,35 +1,56 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "./ui/card";
-import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Trophy, Flame, TrendingUp, Star } from "lucide-react";
+import { motion, useMotionValue, useTransform, animate } from "motion/react";
+import { useEffect, useState } from "react";
+import { Badge as BadgeUI } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { Trophy, Award, Flame, Star } from "lucide-react";
-import { motion } from "motion/react";
-import confetti from "canvas-confetti";
+
+interface Badge {
+  id: string;
+  name: string;
+  icon: string;
+  unlocked: boolean;
+}
 
 interface ProgressRewardsProps {
   streak: number;
   totalCheckIns: number;
-  badges: Array<{ id: string; name: string; icon: string; unlocked: boolean }>;
-  onBadgeClick?: (badgeId: string) => void;
+  badges: Badge[];
+  onBadgeClick: (badgeId: string) => void;
 }
 
 export function ProgressRewards({ streak, totalCheckIns, badges, onBadgeClick }: ProgressRewardsProps) {
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [hoveredBadge, setHoveredBadge] = useState<string | null>(null);
+  const [displayStreak, setDisplayStreak] = useState(0);
+  const [displayCheckIns, setDisplayCheckIns] = useState(0);
+  
+  // Animated counter effect
+  useEffect(() => {
+    const duration = 1500; // 1.5 seconds
+    const steps = 60;
+    const stepDuration = duration / steps;
+    
+    let currentStep = 0;
+    const streakIncrement = streak / steps;
+    const checkInsIncrement = totalCheckIns / steps;
+    
+    const timer = setInterval(() => {
+      currentStep++;
+      if (currentStep <= steps) {
+        setDisplayStreak(Math.round(streakIncrement * currentStep));
+        setDisplayCheckIns(Math.round(checkInsIncrement * currentStep));
+      } else {
+        setDisplayStreak(streak);
+        setDisplayCheckIns(totalCheckIns);
+        clearInterval(timer);
+      }
+    }, stepDuration);
+    
+    return () => clearInterval(timer);
+  }, [streak, totalCheckIns]);
 
   const nextMilestone = Math.ceil(totalCheckIns / 10) * 10;
   const progressToNext = ((totalCheckIns % 10) / 10) * 100;
-
-  useEffect(() => {
-    if (showConfetti) {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.8 },
-        colors: ['#3AA76D', '#88C0F7', '#F5A623'],
-      });
-      setShowConfetti(false);
-    }
-  }, [showConfetti]);
 
   const streakPercentage = Math.min((streak / 30) * 100, 100);
   const strokeDasharray = 2 * Math.PI * 45;
@@ -79,18 +100,18 @@ export function ProgressRewards({ streak, totalCheckIns, badges, onBadgeClick }:
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <Flame className="h-6 w-6 text-secondary mb-1" />
-                <p className="text-2xl font-bold">{streak}</p>
+                <motion.p className="text-2xl font-bold">{displayStreak}</motion.p>
                 <p className="text-xs text-muted-foreground">days</p>
               </div>
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-muted-foreground mb-2">
-                Nice! {streak} day{streak !== 1 ? 's' : ''} in a row — small & steady.
-              </p>
+              <motion.p className="text-sm text-muted-foreground mb-2">
+                Nice! {displayStreak} day{streak !== 1 ? 's' : ''} in a row — small & steady.
+              </motion.p>
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">{totalCheckIns} check-ins</span>
+                  <motion.span className="text-muted-foreground">{displayCheckIns} check-ins</motion.span>
                   <span className="text-muted-foreground">Next: {nextMilestone}</span>
                 </div>
                 <Progress value={progressToNext} className="h-2" />
@@ -102,9 +123,9 @@ export function ProgressRewards({ streak, totalCheckIns, badges, onBadgeClick }:
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium">Badges</span>
-              <Badge variant="outline" className="text-xs">
+              <BadgeUI variant="outline" className="text-xs">
                 {badges.filter(b => b.unlocked).length}/{badges.length}
-              </Badge>
+              </BadgeUI>
             </div>
             <div className="grid grid-cols-4 gap-3">
               {badges.map((badge, index) => (
@@ -141,14 +162,14 @@ export function ProgressRewards({ streak, totalCheckIns, badges, onBadgeClick }:
               <div className="flex items-center justify-center mb-1">
                 <Trophy className="h-5 w-5 text-secondary" />
               </div>
-              <p className="text-lg font-bold">{totalCheckIns}</p>
+              <motion.p className="text-lg font-bold">{displayCheckIns}</motion.p>
               <p className="text-xs text-muted-foreground">Check-ins</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-1">
                 <Flame className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-lg font-bold">{streak}</p>
+              <motion.p className="text-lg font-bold">{displayStreak}</motion.p>
               <p className="text-xs text-muted-foreground">Day Streak</p>
             </div>
             <div className="text-center">

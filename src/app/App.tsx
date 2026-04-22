@@ -8,6 +8,7 @@ import { MoodCircleFeed } from "./components/mood-circle-feed";
 import { ProgressRewards } from "./components/progress-rewards";
 import { ResourcesHelp } from "./components/resources-help";
 import { JournalCTA } from "./components/journal-cta";
+import { Confetti } from "./components/confetti";
 import { toast } from "sonner";
 import { Toaster } from "./components/ui/sonner";
 
@@ -84,6 +85,7 @@ export default function App() {
   const [totalCheckIns, setTotalCheckIns] = useState(23);
   const [lastCheckInDate, setLastCheckInDate] = useState<string | null>("2026-03-16"); // Mock last check-in
   const [checkedInToday, setCheckedInToday] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const getTodayDateString = () => {
     const today = new Date();
@@ -124,6 +126,7 @@ export default function App() {
       setStreak(newStreak);
       setLastCheckInDate(today);
       setCheckedInToday(true);
+      setShowConfetti(true); // Show celebration on first check-in of the day
     }
 
     setCurrentMood(mood);
@@ -265,6 +268,7 @@ export default function App() {
       </main>
 
       <Toaster position="top-center" />
+      <Confetti show={showConfetti} onComplete={() => setShowConfetti(false)} />
     </div>
   );
 }

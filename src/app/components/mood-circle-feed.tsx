@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Heart, MessageCircle, UserPlus } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
 
 interface MoodCircleItem {
   id: string;
@@ -26,6 +27,13 @@ const getMoodColor = (mood: number) => {
 };
 
 export function MoodCircleFeed({ friends, onCheckIn, onReact }: MoodCircleFeedProps) {
+  const [reactedIds, setReactedIds] = useState<Set<string>>(new Set());
+
+  const handleReact = (friendId: string) => {
+    setReactedIds(prev => new Set(prev).add(friendId));
+    onReact(friendId);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,9 +44,11 @@ export function MoodCircleFeed({ friends, onCheckIn, onReact }: MoodCircleFeedPr
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h4>Mood Circle</h4>
-            <Button variant="ghost" size="sm">
-              <UserPlus className="h-4 w-4" />
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="ghost" size="sm">
+                <UserPlus className="h-4 w-4" />
+              </Button>
+            </motion.div>
           </div>
 
           <div className="space-y-3">
@@ -48,17 +58,22 @@ export function MoodCircleFeed({ friends, onCheckIn, onReact }: MoodCircleFeedPr
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
-                className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/10 transition-colors"
+                whileHover={{ scale: 1.02, x: 4 }}
+                className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/10 transition-colors cursor-pointer"
               >
                 <div className="relative shrink-0">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
-                      {friend.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div
+                  <motion.div whileHover={{ scale: 1.1 }}>
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
+                        {friend.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </motion.div>
+                  <motion.div
                     className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-card"
                     style={{ backgroundColor: getMoodColor(friend.mood) }}
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
                   />
                 </div>
 
@@ -73,24 +88,38 @@ export function MoodCircleFeed({ friends, onCheckIn, onReact }: MoodCircleFeedPr
                 </div>
 
                 <div className="flex gap-1 shrink-0">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0"
-                    onClick={() => onReact(friend.id)}
-                    aria-label="React with heart"
-                  >
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0"
-                    onClick={() => onCheckIn(friend.id)}
-                    aria-label="Check in"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReact(friend.id);
+                      }}
+                      aria-label="React with heart"
+                    >
+                      <Heart 
+                        className={`h-4 w-4 transition-colors ${
+                          reactedIds.has(friend.id) ? 'fill-red-500 text-red-500' : ''
+                        }`}
+                      />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCheckIn(friend.id);
+                      }}
+                      aria-label="Check in"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                    </Button>
+                  </motion.div>
                 </div>
               </motion.div>
             ))}

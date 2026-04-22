@@ -13,34 +13,63 @@ export function JournalCTA({ onAddJournal }: JournalCTAProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.25 }}
+      whileHover={{ scale: 1.01, y: -2 }}
     >
-      <Card className="shadow-xl shadow-accent/10 border-accent/30 bg-gradient-to-br from-accent/5 via-background to-background overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-2xl" />
+      <Card className="shadow-xl shadow-accent/10 border-accent/30 bg-gradient-to-br from-accent/5 via-background to-background overflow-hidden relative cursor-pointer">
+        <motion.div 
+          className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent/20 to-transparent rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
+        <motion.div 
+          className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-primary/20 to-transparent rounded-full blur-2xl"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+        />
         
         <CardContent className="p-6 relative z-10">
           <div className="flex items-start gap-4">
-            <div className="shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg">
+            <motion.div 
+              className="shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-accent to-primary flex items-center justify-center shadow-lg"
+              whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+              transition={{ duration: 0.5 }}
+            >
               <BookOpen className="w-6 h-6 text-white" />
-            </div>
+            </motion.div>
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h4>Write in Your Journal</h4>
-                <Sparkles className="w-4 h-4 text-secondary" />
+                <motion.div
+                  animate={{ 
+                    rotate: [0, 15, -15, 0],
+                    scale: [1, 1.2, 1]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  <Sparkles className="w-4 h-4 text-secondary" />
+                </motion.div>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 Take a moment to capture your thoughts, feelings, and experiences. 
                 Journaling helps you process emotions and track your mental wellness journey.
               </p>
               
-              <Button
-                onClick={onAddJournal}
-                className="w-full sm:w-auto bg-gradient-to-r from-accent to-primary hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
-              >
-                <Pen className="mr-2 h-4 w-4" />
-                Start Writing
-              </Button>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={onAddJournal}
+                  className="w-full sm:w-auto bg-gradient-to-r from-accent to-primary hover:opacity-90 transition-all shadow-lg hover:shadow-xl"
+                >
+                  <Pen className="mr-2 h-4 w-4" />
+                  Start Writing
+                </Button>
+              </motion.div>
             </div>
           </div>
         </CardContent>
