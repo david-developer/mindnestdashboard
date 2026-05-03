@@ -8,6 +8,7 @@ import { MoodCircleFeed } from "./components/mood-circle-feed";
 import { ProgressRewards } from "./components/progress-rewards";
 import { ResourcesHelp } from "./components/resources-help";
 import { JournalCTA } from "./components/journal-cta";
+import { Journal } from "./components/journal";
 import { Confetti } from "./components/confetti";
 import { toast } from "sonner";
 import { Toaster } from "./components/ui/sonner";
@@ -78,6 +79,7 @@ const MOCK_BADGES = [
 ];
 
 export default function App() {
+  const [currentView, setCurrentView] = useState<"dashboard" | "journal">("dashboard");
   const [hasCheckedIn, setHasCheckedIn] = useState(false);
   const [currentMood, setCurrentMood] = useState(0);
   const [currentTags, setCurrentTags] = useState<string[]>([]);
@@ -145,7 +147,7 @@ export default function App() {
   };
 
   const handleAddJournal = () => {
-    toast.info("Journal entry coming soon!");
+    setCurrentView("journal");
   };
 
   const handleShareMood = () => {
@@ -185,6 +187,10 @@ export default function App() {
   const handleContactCounselor = () => {
     toast.info("Opening counselor contact form...");
   };
+
+  if (currentView === "journal") {
+    return <Journal onBack={() => setCurrentView("dashboard")} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
